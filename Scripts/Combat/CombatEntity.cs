@@ -35,6 +35,20 @@ namespace JrpgGame.Combat
             Evasion = evasion;
         }
 
+        public CombatEntity(string name, bool isPlayer, int hp, int maxHp, int mp, int maxMp, int speed, int attack, int defense, float evasion = 0.05f)
+        {
+            Name = name;
+            IsPlayer = isPlayer;
+            Hp = hp;
+            MaxHp = maxHp;
+            Mp = mp;
+            MaxMp = maxMp;
+            Speed = speed;
+            Attack = attack;
+            Defense = defense;
+            Evasion = evasion;
+        }
+
         public static CombatEntity FromCharacter(CharacterData character)
         {
             var stats = character.GetTotalStats();
@@ -43,6 +57,8 @@ namespace JrpgGame.Combat
                 true,
                 character.CurrentHp,
                 character.GetTotalMaxHp(),
+                character.CurrentMp,
+                character.GetTotalMaxMp(),
                 stats.Speed,
                 character.GetTotalPhysicalAttack(),
                 stats.Defense,
@@ -50,8 +66,6 @@ namespace JrpgGame.Combat
             )
             {
                 Level = character.Level,
-                Mp = character.CurrentMp,
-                MaxMp = character.GetTotalMaxMp(),
                 SourceCharacter = character
             };
             return entity;

@@ -17,9 +17,9 @@ namespace JrpgGame.Combat
 
         public List<CombatEntity> Participants { get; private set; } = new List<CombatEntity>();
         public List<CombatEntity> TurnOrder { get; private set; } = new List<CombatEntity>();
-        public int TurnIndex { get; set; } = 0;
+        public int TurnIndex { get; set; } = -1;
 
-        public CombatEntity? CurrentActiveEntity => TurnIndex < TurnOrder.Count ? TurnOrder[TurnIndex] : null;
+        public CombatEntity? CurrentActiveEntity => (TurnIndex >= 0 && TurnIndex < TurnOrder.Count) ? TurnOrder[TurnIndex] : null;
 
         public string EnemyMonsterId { get; set; } = "goblin";
         public int RewardExp { get; set; } = 50;
@@ -60,7 +60,7 @@ namespace JrpgGame.Combat
         {
             // Speed initiative calculation
             TurnOrder = Participants.OrderByDescending(p => p.Speed).ToList();
-            TurnIndex = 0;
+            TurnIndex = -1;
         }
 
         public void AdvanceTurn()
@@ -276,6 +276,13 @@ namespace JrpgGame.Combat
             {
                 _mgr.OnStateChanged?.Invoke(Type);
                 _mgr.Log("Поражение! Игра окончена.");
+
+                var playerEntity = _mgr.Participants.FirstOrDefault(p => p.IsPlayer);
+                if (playerEntity?.SourceCharacter != null)
+                {
+                    playerEntity.SourceCharacter.CurrentHp = playerEntity.Hp;
+                    playerEntity.SourceCharacter.CurrentMp = playerEntity.Mp;
+                }
             }
         }
     }
