@@ -1,0 +1,15 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; but it can be edited manually.
+
+config_version=5
+
+[application]
+
+config/name="Godot JRPG C#"
+config/features=PackedStringArray("4.3", "C#")
+run/main_scene="res://Scenes/World.tscn"
+
+[dotnet]
+
+project/assembly_name="JrpgGame"

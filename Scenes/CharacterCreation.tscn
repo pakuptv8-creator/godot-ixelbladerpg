@@ -1,0 +1,56 @@
+[gd_scene format=3 uid="uid://char_creation_01"]
+
+[node name="CharacterCreation" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Panel"]
+layout_mode = 0
+offset_left = 400.0
+offset_top = 30.0
+offset_right = 750.0
+offset_bottom = 70.0
+text = "Создание Персонажа"
+horizontal_alignment = 1
+
+[node name="NameEdit" type="LineEdit" parent="Panel"]
+layout_mode = 0
+offset_left = 300.0
+offset_top = 100.0
+offset_right = 800.0
+offset_bottom = 140.0
+placeholder_text = "Введите имя героя..."
+
+[node name="RaceOption" type="OptionButton" parent="Panel"]
+layout_mode = 0
+offset_left = 300.0
+offset_top = 160.0
+offset_right = 800.0
+offset_bottom = 200.0
+
+[node name="TraitOption" type="OptionButton" parent="Panel"]
+layout_mode = 0
+offset_left = 300.0
+offset_top = 220.0
+offset_right = 800.0
+offset_bottom = 260.0
+
+[node name="CreateButton" type="Button" parent="Panel"]
+layout_mode = 0
+offset_left = 450.0
+offset_top = 320.0
+offset_right = 650.0
+offset_bottom = 370.0
+text = "Начать Приключение"

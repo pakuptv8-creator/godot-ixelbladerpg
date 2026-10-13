@@ -1,0 +1,6 @@
+.godot/
+bin/
+obj/
+*.user
+*.useros
+*.sln.docstates
