@@ -6,6 +6,7 @@ using JrpgGame.Core;
 using JrpgGame.Dialogue;
 using JrpgGame.Items;
 using JrpgGame.Quests;
+using JrpgGame.UI;
 
 namespace JrpgGame
 {
@@ -14,9 +15,9 @@ namespace JrpgGame
         public static void Main(string[] args)
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            Console.WriteLine("==============================================");
-            Console.WriteLine("    ДОБРО ПОЖАЛОВАТЬ В JRPG (Консольная)     ");
-            Console.WriteLine("==============================================\n");
+            Console.Clear();
+            ConsoleRenderer.PrintEldritchBanner();
+            Console.WriteLine($"\n{ConsoleRenderer.Purple}Welcome to the Dark Eldritch Fantasy JRPG (Console Edition){ConsoleRenderer.Reset}\n");
 
             CreateCharacter();
             SetupQuestsAndDialogue();
@@ -27,20 +28,29 @@ namespace JrpgGame
                 var player = GameManager.Instance.Player;
                 if (player == null || player.CurrentHp <= 0)
                 {
-                    Console.WriteLine("\n[ИГРА ОКОНЧЕНА] Ваш герой пал в бою.");
+                    Console.WriteLine($"\n{ConsoleRenderer.DarkRed}===================================================={ConsoleRenderer.Reset}");
+                    Console.WriteLine($"{ConsoleRenderer.Red}   [ВАША ДУША ПОГЛОЩЕНА БЕЗДНОЙ - GAME OVER]   {ConsoleRenderer.Reset}");
+                    Console.WriteLine($"{ConsoleRenderer.DarkRed}===================================================={ConsoleRenderer.Reset}");
                     break;
                 }
 
-                Console.WriteLine("\n----------------------------------------------");
-                Console.WriteLine($"[ГЕРОЙ: {player.Name} | Уровень: {player.Level} ({player.Archetype} {(string.IsNullOrEmpty(player.Subclass) ? "" : "/ " + player.Subclass)}) | HP: {player.CurrentHp}/{player.GetTotalMaxHp()} | MP: {player.CurrentMp}/{player.GetTotalMaxMp()} | Золото: {InventoryManager.Instance.Gold} | Репутация: {GameManager.Instance.Reputation}]");
-                Console.WriteLine("----------------------------------------------");
-                Console.WriteLine("1. Перейти в Таверну (Разговор с NPC)");
-                Console.WriteLine("2. Лавка Торговца (Покупка/Продажа)");
-                Console.WriteLine("3. Журнал Квестов");
-                Console.WriteLine("4. Отправиться в Подземелье (Пошаговый Бой)");
-                Console.WriteLine("5. Инвентарь и Навыки");
-                Console.WriteLine("6. Выход из игры");
-                Console.Write("Выберите действие (1-6): ");
+                Console.WriteLine();
+                ConsoleRenderer.DrawHeader($"ГЕРОЙ: {player.Name} | {player.Archetype} {(string.IsNullOrEmpty(player.Subclass) ? "" : "• " + player.Subclass)}");
+
+                string hpBar = ConsoleRenderer.GetProgressBar(player.CurrentHp, player.GetTotalMaxHp(), 15);
+                string mpBar = ConsoleRenderer.GetProgressBar(player.CurrentMp, player.GetTotalMaxMp(), 15);
+
+                Console.WriteLine($" {ConsoleRenderer.Red}HP [{hpBar}] {player.CurrentHp}/{player.GetTotalMaxHp()}{ConsoleRenderer.Reset}  │  {ConsoleRenderer.Blue}MP [{mpBar}] {player.CurrentMp}/{player.GetTotalMaxMp()}{ConsoleRenderer.Reset}");
+                Console.WriteLine($" {ConsoleRenderer.Gold}Золото: {InventoryManager.Instance.Gold}{ConsoleRenderer.Reset} │ {ConsoleRenderer.Purple}Репутация / Сакральность: {GameManager.Instance.Reputation}{ConsoleRenderer.Reset} │ {ConsoleRenderer.Cyan}Уровень: {player.Level}{ConsoleRenderer.Reset}");
+                Console.WriteLine($"{ConsoleRenderer.DarkGray}─────────────────────────────────────────────────────────────────────────────{ConsoleRenderer.Reset}");
+
+                Console.WriteLine($" 1. {ConsoleRenderer.Yellow}Окультный Трактир / Разговор с Культистом{ConsoleRenderer.Reset}");
+                Console.WriteLine($" 2. {ConsoleRenderer.Gold}Теневая Лавка Торговца{ConsoleRenderer.Reset}");
+                Console.WriteLine($" 3. {ConsoleRenderer.Cyan}Фолиант Задач и Гримуар Квестов{ConsoleRenderer.Reset}");
+                Console.WriteLine($" 4. {ConsoleRenderer.Red}Спуститься в Оскверненное Подземелье (Пошаговый Бой){ConsoleRenderer.Reset}");
+                Console.WriteLine($" 5. {ConsoleRenderer.Magenta}Инвентарь и Древо Заклинаний{ConsoleRenderer.Reset}");
+                Console.WriteLine($" 6. {ConsoleRenderer.Gray}Покинуть этот мир (Выход){ConsoleRenderer.Reset}");
+                Console.Write($"\n{ConsoleRenderer.Purple}Выберите путь (1-6): {ConsoleRenderer.Reset}");
 
                 string? choice = Console.ReadLine();
                 switch (choice)
@@ -62,10 +72,10 @@ namespace JrpgGame
                         break;
                     case "6":
                         isRunning = false;
-                        Console.WriteLine("Спасибо за игру!");
+                        Console.WriteLine($"\n{ConsoleRenderer.DarkPurple}Мрак смыкает свои объятия... До новых встреч.{ConsoleRenderer.Reset}");
                         break;
                     default:
-                        Console.WriteLine("Неверный ввод, попробуйте снова.");
+                        Console.WriteLine("Неверное знамение, попробуйте снова.");
                         break;
                 }
             }
@@ -73,39 +83,39 @@ namespace JrpgGame
 
         private static void CreateCharacter()
         {
-            Console.WriteLine("=== СОЗДАНИЕ ПЕРСОНАЖА ===");
-            Console.Write("Введите имя героя: ");
-            string name = Console.ReadLine() ?? "Герой";
+            ConsoleRenderer.DrawHeader("СОЗДАНИЕ ИЗБРАННОГО");
+            Console.Write($"{ConsoleRenderer.Cyan}Введите имя смертного: {ConsoleRenderer.Reset}");
+            string name = Console.ReadLine() ?? "Путник";
 
-            Console.WriteLine("\nВыберите расу:");
+            Console.WriteLine($"\n{ConsoleRenderer.Purple}Выберите рождение и происхождение:{ConsoleRenderer.Reset}");
             var races = RaceData.GetAvailableRaces();
             for (int i = 0; i < races.Count; i++)
             {
-                Console.WriteLine($"{i + 1}. {races[i].Name} - {races[i].Description}");
+                Console.WriteLine($" {ConsoleRenderer.Gold}{i + 1}.{ConsoleRenderer.Reset} {races[i].Name} - {races[i].Description}");
             }
-            Console.Write("Выбор расы (1-3): ");
+            Console.Write($"\n{ConsoleRenderer.Cyan}Выбор расы (1-3): {ConsoleRenderer.Reset}");
             int raceIdx = 0;
             int.TryParse(Console.ReadLine(), out raceIdx);
             if (raceIdx < 1 || raceIdx > races.Count) raceIdx = 1;
             var selectedRace = races[raceIdx - 1];
 
-            Console.WriteLine("\nВыберите черту (Trait):");
+            Console.WriteLine($"\n{ConsoleRenderer.Purple}Выберите дремлющую черту (Trait):{ConsoleRenderer.Reset}");
             var traits = TraitData.GetAvailableTraits();
             for (int i = 0; i < traits.Count; i++)
             {
-                Console.WriteLine($"{i + 1}. {traits[i].Name} - {traits[i].Description}");
+                Console.WriteLine($" {ConsoleRenderer.Gold}{i + 1}.{ConsoleRenderer.Reset} {traits[i].Name} - {traits[i].Description}");
             }
-            Console.Write("Выбор черты (1-3): ");
+            Console.Write($"\n{ConsoleRenderer.Cyan}Выбор черты (1-3): {ConsoleRenderer.Reset}");
             int traitIdx = 0;
             int.TryParse(Console.ReadLine(), out traitIdx);
             if (traitIdx < 1 || traitIdx > traits.Count) traitIdx = 1;
             var selectedTrait = traits[traitIdx - 1];
 
-            Console.WriteLine("\nВыберите класс:");
-            Console.WriteLine("1. Воин");
-            Console.WriteLine("2. Маг");
-            Console.WriteLine("3. Разбойник");
-            Console.Write("Выбор класса (1-3): ");
+            Console.WriteLine($"\n{ConsoleRenderer.Purple}Выберите Путь Искусства:{ConsoleRenderer.Reset}");
+            Console.WriteLine($" {ConsoleRenderer.Red}1. Воин Крови (Warrior){ConsoleRenderer.Reset}");
+            Console.WriteLine($" {ConsoleRenderer.Blue}2. Маг Бездны (Mage){ConsoleRenderer.Reset}");
+            Console.WriteLine($" {ConsoleRenderer.Green}3. Теневой Убийца (Rogue){ConsoleRenderer.Reset}");
+            Console.Write($"\n{ConsoleRenderer.Cyan}Выбор класса (1-3): {ConsoleRenderer.Reset}");
             string classChoice = Console.ReadLine() ?? "1";
             string archetype = classChoice switch
             {
@@ -120,32 +130,30 @@ namespace JrpgGame
             };
 
             GameManager.Instance.Player = player;
-            Console.WriteLine($"\n Персонаж '{player.Name}' ({player.Race.Name}, {player.Archetype}) успешно создан!");
+            Console.WriteLine($"\n{ConsoleRenderer.Green}Персонаж '{player.Name}' ({player.Race.Name}, {player.Archetype}) успешно ступил на земли Мрака!{ConsoleRenderer.Reset}");
         }
 
         private static void SetupQuestsAndDialogue()
         {
-            // Setup Quest
             var qm = QuestManager.Instance;
-            var goblinQuest = new Quest("q_goblin", "Угроза Гоблинов", "Убейте 2 гоблинов в подземелье.", rewardGold: 80, rewardExp: 150);
-            goblinQuest.Objectives.Add(new QuestObjective("goblin", "Убить гоблинов", ObjectiveType.Kill, 2));
+            var goblinQuest = new Quest("q_goblin", "Осквернение Бездны", "Истребите 2 Щупальцевых Тварей в темных подземельях.", rewardGold: 120, rewardExp: 200);
+            goblinQuest.Objectives.Add(new QuestObjective("tentacle", "Убить Тварей Бездны", ObjectiveType.Kill, 2));
             qm.RegisterQuest(goblinQuest);
 
-            // Setup Dialogue
             var dm = DialogueManager.Instance;
-            var node1 = new DialogueNode("elder_start", "Старейшина", "Здравствуй, путник! Гоблины из подземелья совсем одолели нашу деревню.");
-            node1.Options.Add(new DialogueOption("Я помогу вам расправиться с ними! (+Репутация)", "elder_quest", () =>
+            var node1 = new DialogueNode("elder_start", "Жрец Древних", "Приветствую тебя, ищущий... Из глубин подземного разлома пробудились древние Щупальцевые Твари.");
+            node1.Options.Add(new DialogueOption("Я очищу подземелье от этой скверны! (+Репутация)", "elder_quest", () =>
             {
-                GameManager.Instance.ChangeReputation(10);
+                GameManager.Instance.ChangeReputation(15);
                 QuestManager.Instance.StartQuest("q_goblin");
             }));
-            node1.Options.Add(new DialogueOption("Мне это не интересно.", "elder_decline", () =>
+            node1.Options.Add(new DialogueOption("Моя душа не продается. (Отвергнуть)", "elder_decline", () =>
             {
-                GameManager.Instance.ChangeReputation(-5);
+                GameManager.Instance.ChangeReputation(-10);
             }));
 
-            var node2 = new DialogueNode("elder_quest", "Старейшина", "Спасибо тебе! Квест 'Угроза Гоблинов' добавлен в твой журнал!");
-            var node3 = new DialogueNode("elder_decline", "Старейшина", "Жаль... Надеюсь, ты передумаешь.");
+            var node2 = new DialogueNode("elder_quest", "Жрец Древних", "Благословенны твои клинки! Квест 'Осквернение Бездны' занесен в твой Гримуар.");
+            var node3 = new DialogueNode("elder_decline", "Жрец Древних", "Шепот Бездны всё равно настигнет тебя...");
 
             dm.RegisterNode(node1);
             dm.RegisterNode(node2);
@@ -154,14 +162,14 @@ namespace JrpgGame
 
         private static void VisitTavern()
         {
-            Console.WriteLine("\n=== ТАВЕРНА И РАЗГОВОР С NPC ===");
+            ConsoleRenderer.DrawHeader("ОКУЛЬТНЫЙ ТРАКТИР 'ПЕПЕЛ И КРОВЬ'");
             var dm = DialogueManager.Instance;
             dm.StartDialogue("elder_start");
 
             while (dm.CurrentNode != null)
             {
                 var node = dm.CurrentNode;
-                Console.WriteLine($"\n[{node.SpeakerName}]: {node.Text}");
+                Console.WriteLine($"\n{ConsoleRenderer.Purple}[{node.SpeakerName}]:{ConsoleRenderer.Reset} {node.Text}");
 
                 if (node.Options.Count == 0)
                 {
@@ -169,11 +177,12 @@ namespace JrpgGame
                     break;
                 }
 
+                Console.WriteLine();
                 for (int i = 0; i < node.Options.Count; i++)
                 {
-                    Console.WriteLine($"{i + 1}. {node.Options[i].Text}");
+                    Console.WriteLine($" {ConsoleRenderer.Gold}{i + 1}.{ConsoleRenderer.Reset} {node.Options[i].Text}");
                 }
-                Console.Write("Выберите ответ: ");
+                Console.Write($"\n{ConsoleRenderer.Cyan}Выберите слово: {ConsoleRenderer.Reset}");
                 int option = 0;
                 int.TryParse(Console.ReadLine(), out option);
                 dm.SelectOption(option - 1);
@@ -188,22 +197,22 @@ namespace JrpgGame
             bool inShop = true;
             while (inShop)
             {
-                Console.WriteLine($"\n=== ЛАВКА ТОРГОВЦА (Ваше золото: {inv.Gold}) ===");
-                Console.WriteLine("1. Купить товары");
-                Console.WriteLine("2. Продать товары");
-                Console.WriteLine("3. Выйти из лавки");
-                Console.Write("Выберите действие: ");
+                ConsoleRenderer.DrawHeader($"ТЕНЕВАЯ ЛАВКА (Золото: {inv.Gold})");
+                Console.WriteLine($" 1. {ConsoleRenderer.Gold}Купить артефакты и зелья{ConsoleRenderer.Reset}");
+                Console.WriteLine($" 2. {ConsoleRenderer.Green}Продать трофеи{ConsoleRenderer.Reset}");
+                Console.WriteLine($" 3. {ConsoleRenderer.Gray}Покинуть лавку{ConsoleRenderer.Reset}");
+                Console.Write($"\n{ConsoleRenderer.Cyan}Выберите действие: {ConsoleRenderer.Reset}");
 
                 string choice = Console.ReadLine() ?? "";
                 if (choice == "1")
                 {
-                    Console.WriteLine("\n-- ТОВАРЫ НА ПРОДАЖУ --");
+                    Console.WriteLine($"\n{ConsoleRenderer.Gold}-- ТОВАРЫ НА ПРОДАЖУ --{ConsoleRenderer.Reset}");
                     for (int i = 0; i < shop.ShopCatalog.Count; i++)
                     {
                         var item = shop.ShopCatalog[i];
-                        Console.WriteLine($"{i + 1}. {item.Name} - {item.Description} (Цена: {item.BuyPrice} зол.)");
+                        Console.WriteLine($" {i + 1}. {item.Name} - {item.Description} (Цена: {item.BuyPrice} зол.)");
                     }
-                    Console.Write("Выберите предмет для покупки (0 для отмены): ");
+                    Console.Write($"\n{ConsoleRenderer.Cyan}Купить предмет (0 для отмены): {ConsoleRenderer.Reset}");
                     int idx = 0;
                     int.TryParse(Console.ReadLine(), out idx);
                     if (idx > 0 && idx <= shop.ShopCatalog.Count)
@@ -211,17 +220,17 @@ namespace JrpgGame
                         var target = shop.ShopCatalog[idx - 1];
                         if (shop.BuyItem(inv, target))
                         {
-                            Console.WriteLine($"Вы успешно купили '{target.Name}'!");
+                            Console.WriteLine($"\n{ConsoleRenderer.Green}Вы приобрели '{target.Name}'!{ConsoleRenderer.Reset}");
                         }
                         else
                         {
-                            Console.WriteLine("Недостаточно золота!");
+                            Console.WriteLine($"\n{ConsoleRenderer.Red}Недостаточно золота!{ConsoleRenderer.Reset}");
                         }
                     }
                 }
                 else if (choice == "2")
                 {
-                    Console.WriteLine("\n-- ВАШ ИНВЕНТАРЬ ДЛЯ ПРОДАЖИ --");
+                    Console.WriteLine($"\n{ConsoleRenderer.Green}-- ВАШИ ПРЕДМЕТЫ --{ConsoleRenderer.Reset}");
                     if (inv.Items.Count == 0)
                     {
                         Console.WriteLine("Ваш инвентарь пуст.");
@@ -231,16 +240,16 @@ namespace JrpgGame
                     for (int i = 0; i < inv.Items.Count; i++)
                     {
                         var item = inv.Items[i];
-                        Console.WriteLine($"{i + 1}. {item.Name} (Цена продажи: {item.SellPrice} зол.)");
+                        Console.WriteLine($" {i + 1}. {item.Name} (Выручка: {item.SellPrice} зол.)");
                     }
-                    Console.Write("Выберите предмет для продажи (0 для отмены): ");
+                    Console.Write($"\n{ConsoleRenderer.Cyan}Продать предмет (0 для отмены): {ConsoleRenderer.Reset}");
                     int idx = 0;
                     int.TryParse(Console.ReadLine(), out idx);
                     if (idx > 0 && idx <= inv.Items.Count)
                     {
                         var target = inv.Items[idx - 1];
                         shop.SellItem(inv, target);
-                        Console.WriteLine($"Вы продали '{target.Name}'!");
+                        Console.WriteLine($"\n{ConsoleRenderer.Gold}Вы продали '{target.Name}'!{ConsoleRenderer.Reset}");
                     }
                 }
                 else
@@ -252,30 +261,31 @@ namespace JrpgGame
 
         private static void ShowQuestJournal()
         {
-            Console.WriteLine("\n=== ЖУРНАЛ КВЕСТОВ ===");
+            ConsoleRenderer.DrawHeader("ГРИМУАР КВЕСТОВ И ЗАДАЧ");
             var qm = QuestManager.Instance;
             if (qm.Quests.Count == 0)
             {
-                Console.WriteLine("У вас нет активных или взятых квестов.");
+                Console.WriteLine("Гримуар пуст. Вы еще не приняли предначертанных испытаний.");
                 return;
             }
 
             foreach (var q in qm.Quests)
             {
-                Console.WriteLine($"\nКвест: {q.Title} [{q.State}]");
+                Console.WriteLine($"\n{ConsoleRenderer.Purple}Квест:{ConsoleRenderer.Reset} {q.Title} [{q.State}]");
                 Console.WriteLine($"Описание: {q.Description}");
                 foreach (var obj in q.Objectives)
                 {
-                    Console.WriteLine($" - Цель: {obj.Description} ({obj.CurrentCount}/{obj.RequiredCount})");
+                    string progress = ConsoleRenderer.GetProgressBar(obj.CurrentCount, obj.RequiredCount, 10);
+                    Console.WriteLine($" - Цель: {obj.Description} [{progress}] ({obj.CurrentCount}/{obj.RequiredCount})");
                 }
 
                 if (q.State == QuestState.Active && q.IsObjectivesComplete)
                 {
-                    Console.WriteLine(" Квест выполнен! Забрать награду? (y/n)");
+                    Console.Write($"\n{ConsoleRenderer.Gold}Квест выполнен! Получить награду? (y/n): {ConsoleRenderer.Reset}");
                     if (Console.ReadLine()?.ToLower() == "y")
                     {
                         qm.CompleteQuest(q.Id);
-                        Console.WriteLine($"Награда получена! (+{q.RewardGold} золота, +{q.RewardExp} опыта)");
+                        Console.WriteLine($"\n{ConsoleRenderer.Green}Награда получена! (+{q.RewardGold} золота, +{q.RewardExp} опыта!){ConsoleRenderer.Reset}");
                     }
                 }
             }
@@ -286,14 +296,16 @@ namespace JrpgGame
             var player = GameManager.Instance.Player;
             if (player == null) return;
 
-            Console.WriteLine("\n=== ПОДЗЕМЕЛЬЕ: ПОШАГОВЫЙ БОЙ ===");
-            var enemy = new CombatEntity("Дикий Гоблин", false, hp: 40, mp: 0, speed: 12, attack: 14, defense: 3);
+            ConsoleRenderer.DrawHeader("ОСКВЕРНЕННОЕ ПОДЗЕМЕЛЬЕ - БОЙ");
+            Console.WriteLine(ConsoleRenderer.GetMonsterSprite("tentacle"));
+
+            var enemy = new CombatEntity("Щупальцевая Тварь Бездны", false, hp: 45, maxHp: 45, mp: 0, maxMp: 0, speed: 12, attack: 15, defense: 3);
             var cm = CombatManager.Instance;
 
-            cm.OnCombatLog -= Console.WriteLine;
-            cm.OnCombatLog += Console.WriteLine;
+            cm.OnCombatLog -= LogCombat;
+            cm.OnCombatLog += LogCombat;
 
-            cm.StartCombat(player, enemy, monsterId: "goblin", expReward: 100, goldReward: 40);
+            cm.StartCombat(player, enemy, monsterId: "tentacle", expReward: 120, goldReward: 50);
 
             while (cm.StateMachine.CurrentState != null &&
                    cm.StateMachine.CurrentState.Type != CombatStateType.Victory &&
@@ -304,14 +316,19 @@ namespace JrpgGame
                     var pEntity = cm.Participants.Find(p => p.IsPlayer)!;
                     var eEntity = cm.Participants.Find(p => !p.IsPlayer)!;
 
-                    Console.WriteLine($"\n--- Ваш Ход ---");
-                    Console.WriteLine($"Вы: HP {pEntity.Hp}/{pEntity.MaxHp} | MP {pEntity.Mp}/{pEntity.MaxMp}");
-                    Console.WriteLine($"Противник: {eEntity.Name} | HP {eEntity.Hp}/{eEntity.MaxHp}");
-                    Console.WriteLine("1. Базовая Атака");
-                    Console.WriteLine("2. Использовать Навык");
-                    Console.WriteLine("3. Защита");
-                    Console.WriteLine("4. Побег");
-                    Console.Write("Выберите действие: ");
+                    string pHpBar = ConsoleRenderer.GetProgressBar(pEntity.Hp, pEntity.MaxHp, 10);
+                    string eHpBar = ConsoleRenderer.GetProgressBar(eEntity.Hp, eEntity.MaxHp, 10);
+
+                    Console.WriteLine($"\n{ConsoleRenderer.DarkPurple}────────────── СТАТУС СРАЖЕНИЯ ──────────────{ConsoleRenderer.Reset}");
+                    Console.WriteLine($" {ConsoleRenderer.Cyan}{pEntity.Name}:{ConsoleRenderer.Reset} HP [{pHpBar}] {pEntity.Hp}/{pEntity.MaxHp} | MP {pEntity.Mp}/{pEntity.MaxMp}");
+                    Console.WriteLine($" {ConsoleRenderer.Red}{eEntity.Name}:{ConsoleRenderer.Reset} HP [{eHpBar}] {eEntity.Hp}/{eEntity.MaxHp}");
+                    Console.WriteLine($"{ConsoleRenderer.DarkPurple}────────────────────────────────────────────{ConsoleRenderer.Reset}");
+
+                    Console.WriteLine($" 1. {ConsoleRenderer.Red}Удар Клинком{ConsoleRenderer.Reset}");
+                    Console.WriteLine($" 2. {ConsoleRenderer.Blue}Использовать Заклинание{ConsoleRenderer.Reset}");
+                    Console.WriteLine($" 3. {ConsoleRenderer.Yellow}Защитная Стойка{ConsoleRenderer.Reset}");
+                    Console.WriteLine($" 4. {ConsoleRenderer.Gray}Побег в Тень{ConsoleRenderer.Reset}");
+                    Console.Write($"\n{ConsoleRenderer.Cyan}Ваше решение (1-4): {ConsoleRenderer.Reset}");
 
                     string choice = Console.ReadLine() ?? "1";
                     if (choice == "1")
@@ -322,12 +339,12 @@ namespace JrpgGame
                     else if (choice == "2")
                     {
                         var learnable = ClassEvolution.GetLearnableSkillsForCharacter(player);
-                        Console.WriteLine("Доступные навыки:");
+                        Console.WriteLine($"\n{ConsoleRenderer.Blue}Гримуар Заклинаний:{ConsoleRenderer.Reset}");
                         for (int i = 0; i < learnable.Count; i++)
                         {
-                            Console.WriteLine($"{i + 1}. {learnable[i].Name} (MP: {learnable[i].MpCost}, Урон/Лечение: {learnable[i].Power})");
+                            Console.WriteLine($" {i + 1}. {learnable[i].Name} (MP: {learnable[i].MpCost}, Сила: {learnable[i].Power})");
                         }
-                        Console.Write("Выберите навык (0 для отмены): ");
+                        Console.Write($"\n{ConsoleRenderer.Cyan}Выберите заклинание (0 для отмены): {ConsoleRenderer.Reset}");
                         int sIdx = 0;
                         int.TryParse(Console.ReadLine(), out sIdx);
                         if (sIdx > 0 && sIdx <= learnable.Count)
@@ -351,25 +368,29 @@ namespace JrpgGame
                 }
             }
 
-            // Subclass unlock notification check at Level 10
             if (player.Level >= 10 && string.IsNullOrEmpty(player.Subclass))
             {
-                Console.WriteLine($"\n ВЫ ДОСТИГЛИ 10 УРОВНЯ! Открыт выбор подкласса!");
+                Console.WriteLine($"\n{ConsoleRenderer.Gold} ВЫ ДОСТИГЛИ 10 УРОВНЯ! Пробудился истинный Подкласс!{ConsoleRenderer.Reset}");
                 var subclasses = ClassEvolution.GetAvailableSubclasses(player.Archetype);
-                Console.WriteLine("Выберите Ваш Подкласс:");
+                Console.WriteLine("Выберите Ваш Высший Подкласс:");
                 for (int i = 0; i < subclasses.Count; i++)
                 {
-                    Console.WriteLine($"{i + 1}. {subclasses[i]}");
+                    Console.WriteLine($" {i + 1}. {subclasses[i]}");
                 }
-                Console.Write("Выбор подкласса: ");
+                Console.Write($"\n{ConsoleRenderer.Cyan}Выбор подкласса: {ConsoleRenderer.Reset}");
                 int subIdx = 0;
                 int.TryParse(Console.ReadLine(), out subIdx);
                 if (subIdx > 0 && subIdx <= subclasses.Count)
                 {
                     ClassEvolution.SelectSubclass(player, subclasses[subIdx - 1]);
-                    Console.WriteLine($"Поздравляем! Ваш подкласс теперь: {player.Subclass}");
+                    Console.WriteLine($"\n{ConsoleRenderer.Purple}Поздравляем! Ваш подкласс теперь: {player.Subclass}{ConsoleRenderer.Reset}");
                 }
             }
+        }
+
+        private static void LogCombat(string msg)
+        {
+            Console.WriteLine($"  {ConsoleRenderer.Gray}» {msg}{ConsoleRenderer.Reset}");
         }
 
         private static void ShowInventoryAndSkills()
@@ -377,15 +398,15 @@ namespace JrpgGame
             var player = GameManager.Instance.Player;
             if (player == null) return;
 
-            Console.WriteLine("\n=== ИНВЕНТАРЬ И НАВЫКИ ===");
-            Console.WriteLine($"Герой: {player.Name} | Класс: {player.Archetype} | Подкласс: {(string.IsNullOrEmpty(player.Subclass) ? "Отсутствует (доступно с 10 уровня)" : player.Subclass)}");
+            ConsoleRenderer.DrawHeader("ИНВЕНТАРЬ И ГРИМУАР НАВЫКОВ");
+            Console.WriteLine($"Избранный: {player.Name} | Класс: {player.Archetype} | Подкласс: {(string.IsNullOrEmpty(player.Subclass) ? "Дремлет (с 10 уровня)" : player.Subclass)}");
             Console.WriteLine($"Характеристики -> Сила: {player.GetTotalStats().Strength}, Ловкость: {player.GetTotalStats().Agility}, Интеллект: {player.GetTotalStats().Intelligence}, Живучесть: {player.GetTotalStats().Vitality}");
 
-            Console.WriteLine("\nПредметы в инвентаре:");
+            Console.WriteLine($"\n{ConsoleRenderer.Gold}Предметы в сумке:{ConsoleRenderer.Reset}");
             var items = InventoryManager.Instance.Items;
             if (items.Count == 0)
             {
-                Console.WriteLine(" Инвентарь пуст.");
+                Console.WriteLine(" Сумка пуста.");
             }
             else
             {
@@ -395,7 +416,7 @@ namespace JrpgGame
                 }
             }
 
-            Console.WriteLine("\nИзученные и доступные навыки:");
+            Console.WriteLine($"\n{ConsoleRenderer.Purple}Изученные заклинания и приемы:{ConsoleRenderer.Reset}");
             var skills = ClassEvolution.GetLearnableSkillsForCharacter(player);
             foreach (var s in skills)
             {

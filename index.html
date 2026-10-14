@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chronicles of the Eldritch Void - JRPG</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Metamorphous&family=MedievalSharp&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="game-container">
+    <!-- Header HUD -->
+    <header id="main-hud" class="hidden">
+      <div class="hud-profile">
+        <div class="portrait-box"><div id="hero-avatar">🗡️</div></div>
+        <div class="hero-details">
+          <div id="hero-name-title">Hero</div>
+          <div id="hero-class-badge">Class</div>
+          <div class="level-badge">Уровень: <span id="hud-level">1</span> (EXP: <span id="hud-exp">0</span>/<span id="hud-next-exp">100</span>)</div>
+        </div>
+      </div>
+      <div class="hud-bars">
+        <div class="bar-container hp-bar-wrap">
+          <span class="bar-label">HP</span>
+          <div class="bar-bg"><div id="hp-fill" class="bar-fill hp-fill" style="width: 100%;"></div></div>
+          <span id="hp-text" class="bar-text">100 / 100</span>
+        </div>
+        <div class="bar-container mp-bar-wrap">
+          <span class="bar-label">MP</span>
+          <div class="bar-bg"><div id="mp-fill" class="bar-fill mp-fill" style="width: 100%;"></div></div>
+          <span id="mp-text" class="bar-text">50 / 50</span>
+        </div>
+      </div>
+      <div class="hud-currency">
+        <div class="currency-item">🪙 <span id="hud-gold">100</span> Золото</div>
+        <div class="currency-item">🔮 <span id="hud-reputation">0</span> Репутация</div>
+      </div>
+    </header>
+
+    <!-- Navigation Bar -->
+    <nav id="main-nav" class="hidden">
+      <button class="nav-btn active" data-tab="tab-world">🗺️ Карта Мира</button>
+      <button class="nav-btn" data-tab="tab-dialogue">💬 Окультный Трактир</button>
+      <button class="nav-btn" data-tab="tab-shop">🏪 Теневая Лавка</button>
+      <button class="nav-btn" data-tab="tab-quests">📜 Гримуар Квестов</button>
+      <button class="nav-btn" data-tab="tab-character">⚔️ Герой & Навыки</button>
+      <button class="nav-btn danger-btn" data-tab="tab-combat">⚔️ Вступить в Бой</button>
+    </nav>
+
+    <!-- Main View Content Area -->
+    <main id="view-viewport">
+
+      <!-- View: Character Creation -->
+      <section id="view-creation" class="view-panel active-view">
+        <div class="gothic-frame creation-frame">
+          <h1 class="title-glow">ПРОБУЖДЕНИЕ ИЗБРАННОГО</h1>
+          <p class="subtitle">Створите своего героя пред ликом Бездны</p>
+
+          <div class="creation-grid">
+            <div class="creation-form">
+              <div class="form-group">
+                <label for="input-hero-name">Имя Героя:</label>
+                <input type="text" id="input-hero-name" placeholder="Введите имя..." value="Альберт">
+              </div>
+
+              <div class="form-group">
+                <label>Происхождение (Раса):</label>
+                <select id="select-race">
+                  <option value="human">Человек Древних Семлян (+2 ко всем характеристикам)</option>
+                  <option value="elf">Лунно-Лесной Эльф (+4 Ловкость, +4 Интеллект)</option>
+                  <option value="dwarf">Подземный Дварф-Кузнец (+4 Сила, +4 Живучесть)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Дремлющая Черта (Trait):</label>
+                <select id="select-trait">
+                  <option value="stealth">Скрытный (Shadow Walker) - +10% Уворот, -2 Сила Атаки</option>
+                  <option value="blood">Кровь Древних (Eldritch Blood) - +4 Сила, +3 Живучесть</option>
+                  <option value="gnosis">Окультист (Black Gnosis) - +5 Интеллект, +1 Живучесть</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Путь Искусства (Класс):</label>
+                <div class="class-selector">
+                  <button class="class-btn selected" data-class="Warrior">⚔️ Воин Крови</button>
+                  <button class="class-btn" data-class="Mage">🔮 Маг Бездны</button>
+                  <button class="class-btn" data-class="Rogue">🗡️ Теневой Убийца</button>
+                </div>
+              </div>
+
+              <button id="btn-start-game" class="gothic-button primary-button">СТУПИТЬ ВО МРАК</button>
+            </div>
+
+            <div class="creation-preview gothic-card">
+              <h3>Предпросмотр Персонажа</h3>
+              <div class="avatar-large">🛡️</div>
+              <div id="preview-stats-list" class="stats-list">
+                <div>Сила (STR): <span id="prev-str">10</span></div>
+                <div>Ловкость (AGI): <span id="prev-agi">10</span></div>
+                <div>Интеллект (INT): <span id="prev-int">10</span></div>
+                <div>Живучесть (VIT): <span id="prev-vit">10</span></div>
+                <hr>
+                <div>Макс. HP: <span id="prev-hp">120</span></div>
+                <div>Макс. MP: <span id="prev-mp">90</span></div>
+                <div>Атака: <span id="prev-atk">25</span></div>
+                <div>Уклонение: <span id="prev-evasion">10%</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: World Map -->
+      <section id="tab-world" class="view-panel hidden">
+        <div class="gothic-frame world-frame">
+          <h2>Карта Земель Мрака</h2>
+          <p>Выберите локацию для исследования и приключений:</p>
+          <div class="world-locations-grid">
+            <div class="location-card" onclick="switchTab('tab-dialogue')">
+              <div class="loc-icon">🏚️</div>
+              <h3>Окультный Трактир</h3>
+              <p>Разговаривайте с культистами и жрецами, берите задания.</p>
+            </div>
+            <div class="location-card" onclick="switchTab('tab-shop')">
+              <div class="loc-icon">🗝️</div>
+              <h3>Теневая Лавка</h3>
+              <p>Торгуйте оружием, броней и целебными зельями.</p>
+            </div>
+            <div class="location-card dungeon-card" onclick="switchTab('tab-combat')">
+              <div class="loc-icon">👁️</div>
+              <h3>Оскверненное Подземелье</h3>
+              <p class="danger-text">Вступите в пошаговый бой с Тварями Бездны!</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Dialogue UI -->
+      <section id="tab-dialogue" class="view-panel hidden">
+        <div class="gothic-frame dialogue-frame">
+          <h2>Окультный Трактир "Пепел и Кровь"</h2>
+          <div class="dialogue-stage">
+            <div class="npc-portrait-box">
+              <div id="npc-avatar">🧙‍♂️</div>
+              <div id="npc-name">Жрец Древних</div>
+            </div>
+            <div class="dialogue-bubble gothic-card">
+              <div id="dialogue-text">Приветствую тебя, путник... Разлом Бездны ширится.</div>
+              <div id="dialogue-choices" class="choices-container"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Shop UI -->
+      <section id="tab-shop" class="view-panel hidden">
+        <div class="gothic-frame shop-frame">
+          <h2>Теневая Лавка Торговца</h2>
+          <div class="shop-grid">
+            <div class="shop-catalog gothic-card">
+              <h3>Товары Продавца</h3>
+              <div id="shop-items-list" class="item-grid"></div>
+            </div>
+            <div class="player-inventory-view gothic-card">
+              <h3>Ваши Предметы для Продажи</h3>
+              <div id="shop-player-items-list" class="item-grid"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Quests UI -->
+      <section id="tab-quests" class="view-panel hidden">
+        <div class="gothic-frame quests-frame">
+          <h2>Гримуар Квестов</h2>
+          <div id="quests-list" class="quests-container"></div>
+        </div>
+      </section>
+
+      <!-- View: Character & Skill Tree UI -->
+      <section id="tab-character" class="view-panel hidden">
+        <div class="gothic-frame character-frame">
+          <h2>Лист Героя и Древо Навыков</h2>
+          <div class="character-sheet-grid">
+            <div class="gothic-card char-stats-card">
+              <h3>Характеристики</h3>
+              <div id="char-full-stats"></div>
+            </div>
+            <div class="gothic-card skill-tree-card">
+              <h3>Доступные Навыки & Заклинания</h3>
+              <div id="char-skills-list"></div>
+              <div id="subclass-selection-container" class="subclass-box hidden">
+                <h4 class="glow-text">УРОВЕНЬ 10 ДОСТИГНУТ! ВЫБЕРИТЕ ПОДКТАСС:</h4>
+                <div id="subclass-buttons" class="subclass-btns"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- View: Turn-Based Combat Arena -->
+      <section id="tab-combat" class="view-panel hidden">
+        <div class="gothic-frame combat-frame">
+          <h2>ПОШАГОВОЕ СРАЖЕНИЕ</h2>
+
+          <div class="combat-arena">
+            <canvas id="combat-canvas" width="800" height="300"></canvas>
+
+            <div class="arena-overlay">
+              <div class="combatant-status player-status">
+                <div id="combat-player-name">Герой</div>
+                <div class="bar-container"><div id="combat-player-hp" class="bar-fill hp-fill"></div></div>
+                <div id="combat-player-hp-val">100/100</div>
+              </div>
+              <div class="combatant-status enemy-status">
+                <div id="combat-enemy-name">Щупальцевая Тварь</div>
+                <div class="bar-container"><div id="combat-enemy-hp" class="bar-fill hp-fill"></div></div>
+                <div id="combat-enemy-hp-val">50/50</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="combat-controls gothic-card">
+            <div id="combat-log" class="combat-log-box">Журнал боя готов...</div>
+            <div id="combat-actions" class="action-buttons-grid">
+              <button id="btn-atk" class="gothic-button atk-btn">⚔️ Атака Клинком</button>
+              <button id="btn-skill" class="gothic-button skill-btn">🔮 Использовать Навык</button>
+              <button id="btn-defend" class="gothic-button def-btn">🛡️ Защитная Стойка</button>
+              <button id="btn-flee" class="gothic-button flee-btn">🚪 Побег в Тень</button>
+            </div>
+            <div id="combat-skills-selector" class="skills-popover hidden"></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script type="module" src="src/game.js"></script>
+</body>
+</html>

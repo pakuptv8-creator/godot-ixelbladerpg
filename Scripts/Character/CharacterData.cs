@@ -28,7 +28,10 @@ namespace JrpgGame.Character
             Race = race ?? RaceData.GetAvailableRaces()[0];
             if (traits != null)
             {
-                Traits.AddRange(traits);
+                foreach (var t in traits)
+                {
+                    if (t != null) Traits.Add(t);
+                }
             }
 
             ResetHealthAndManaToMax();
@@ -36,17 +39,20 @@ namespace JrpgGame.Character
 
         public Stats GetTotalStats()
         {
-            Stats total = BaseStats.Clone();
+            Stats total = BaseStats != null ? BaseStats.Clone() : new Stats(10, 10, 10, 10);
             if (Race?.StatBonus != null)
             {
                 total += Race.StatBonus;
             }
 
-            foreach (var trait in Traits)
+            if (Traits != null)
             {
-                if (trait.StatBonus != null)
+                foreach (var trait in Traits)
                 {
-                    total += trait.StatBonus;
+                    if (trait != null && trait.StatBonus != null)
+                    {
+                        total += trait.StatBonus;
+                    }
                 }
             }
 
@@ -66,9 +72,12 @@ namespace JrpgGame.Character
         public int GetTotalPhysicalAttack()
         {
             int baseAtk = GetTotalStats().PhysicalAttack;
-            foreach (var trait in Traits)
+            if (Traits != null)
             {
-                baseAtk -= trait.AttackPenalty;
+                foreach (var trait in Traits)
+                {
+                    if (trait != null) baseAtk -= trait.AttackPenalty;
+                }
             }
             return Math.Max(1, baseAtk);
         }
@@ -76,9 +85,12 @@ namespace JrpgGame.Character
         public float GetTotalEvasion()
         {
             float evasion = GetTotalStats().Evasion;
-            foreach (var trait in Traits)
+            if (Traits != null)
             {
-                evasion += trait.EvasionBonus;
+                foreach (var trait in Traits)
+                {
+                    if (trait != null) evasion += trait.EvasionBonus;
+                }
             }
             return evasion;
         }

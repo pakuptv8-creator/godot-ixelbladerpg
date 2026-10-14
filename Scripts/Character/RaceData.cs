@@ -28,9 +28,9 @@ namespace JrpgGame.Character
         {
             return new List<RaceData>
             {
-                new RaceData(RaceType.Human, "Человек", "Сбалансированная раса во всех аспектах.", new Stats(2, 2, 2, 2)),
-                new RaceData(RaceType.Elf, "Эльф", "Высокая ловкость и интеллект, но меньшая живучесть.", new Stats(0, 4, 4, 0)),
-                new RaceData(RaceType.Dwarf, "Дварф", "Высокая сила и живучесть, но меньшая ловкость.", new Stats(4, 0, 0, 4))
+                new RaceData(RaceType.Human, "Человек Древних Семлян", "Сбалансированная раса, стойкая к шепоту Бездны.", new Stats(2, 2, 2, 2)),
+                new RaceData(RaceType.Elf, "Лунно-Лесной Эльф", "Высокая ловкость и разум, познавшие таинства Звездной Магии.", new Stats(0, 4, 4, 0)),
+                new RaceData(RaceType.Dwarf, "Подземный Дварф-Кузнец", "Непревзойденная физическая сила и закаленная живучесть.", new Stats(4, 0, 0, 4))
             };
         }
     }
